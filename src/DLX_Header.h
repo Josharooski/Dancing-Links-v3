@@ -5,23 +5,25 @@
 
 class DLX_Header : public DLX_Node {
     private:
-        DLX_Header* leftPtr;
-        DLX_Header* rightPtr;
+        std::shared_ptr<DLX_Header> leftPtr;
+        std::shared_ptr<DLX_Header> rightPtr;
         char name;
-        int length;
+        int numNodes;
     
     public:
         DLX_Header();
+        DLX_Header(char newName);
+        DLX_Header(std::shared_ptr<DLX_Header> left, std::shared_ptr<DLX_Header> right);
         DLX_Header(const DLX_Header& copyMe);
 
-        void setLeft(DLX_Header* ptr);
-        void setRight(DLX_Header* ptr);
+        void setLeft(std::shared_ptr<DLX_Header> ptr);
+        void setRight(std::shared_ptr<DLX_Header> ptr);
         void setName(char newName);
 
-        DLX_Header* getLeft() const;
-        DLX_Header* getRight() const;
+        std::shared_ptr<DLX_Header> getLeft() const;
+        std::shared_ptr<DLX_Header> getRight() const;
         char getName() const;
-        int getLength() const;
+        int getNumNodes() const;
 };
 
 #endif

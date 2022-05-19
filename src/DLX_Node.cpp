@@ -1,6 +1,10 @@
 #include "DLX_Node.h"
 
-DLX_Node::DLX_Node() : upPtr(nullptr), downPtr(nullptr), listHeader(nullptr){}
+DLX_Node::DLX_Node() {
+    upPtr = nullptr;
+    downPtr = nullptr;
+    upPtr = nullptr;
+}
 
 DLX_Node::DLX_Node(const DLX_Node& copyMe) {
     upPtr = copyMe.upPtr;
@@ -8,26 +12,28 @@ DLX_Node::DLX_Node(const DLX_Node& copyMe) {
     listHeader = copyMe.listHeader;
 }
 
-void DLX_Node::setUp(DLX_Node* ptr) {
+DLX_Node::~DLX_Node() {}
+
+void DLX_Node::setUp(std::shared_ptr<DLX_Node> ptr) {
     upPtr = ptr;
 }
 
-void DLX_Node::setDown(DLX_Node* ptr) {
+void DLX_Node::setDown(std::shared_ptr<DLX_Node> ptr) {
     downPtr = ptr;
 }
 
-void DLX_Node::setHeader(DLX_Node* ptr) {
+void DLX_Node::setHeader(std::shared_ptr<DLX_Node> ptr) {
     listHeader = ptr;
 }
 
-DLX_Node* DLX_Node::getUp() const {
+std::shared_ptr<DLX_Node> DLX_Node::getUp() const {
     return upPtr;
 }
 
-DLX_Node* DLX_Node::getDown() const {
+std::shared_ptr<DLX_Node> DLX_Node::getDown() const {
     return downPtr;
 }
 
-DLX_Node* DLX_Node::getHeader() const {
+std::shared_ptr<DLX_Node> DLX_Node::getHeader() const {
     return listHeader;
 }
