@@ -12,6 +12,7 @@ class DLX_Node {
         std::shared_ptr<DLX_Node> listHeader;
         char name;
         int numNodes;
+        int index;
 
     public:
         DLX_Node();
@@ -25,6 +26,7 @@ class DLX_Node {
         void setDown(std::shared_ptr<DLX_Node> ptr);
         void setHeader(std::shared_ptr<DLX_Node> ptr);
         void setName(char newName);
+        void setIndex(int newIndex);
         void numNodesAdd();
         void numNodesSub();
 
@@ -34,6 +36,7 @@ class DLX_Node {
         std::shared_ptr<DLX_Node> getDown() const;
         std::shared_ptr<DLX_Node> getHeader() const;
         char getName() const;
+        int getIndex() const;
         int getNumNodes() const;
 };
 

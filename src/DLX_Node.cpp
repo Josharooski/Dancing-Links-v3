@@ -8,6 +8,7 @@ DLX_Node::DLX_Node() {
     listHeader = nullptr;
     name = '\0';
     numNodes = 0;
+    index = 0;
 }
 
 DLX_Node::DLX_Node(char newName) {
@@ -18,6 +19,7 @@ DLX_Node::DLX_Node(char newName) {
     listHeader = nullptr;
     name = newName;
     numNodes = 0;
+    index = -1;
 }
 
 DLX_Node::DLX_Node(const DLX_Node& copyMe) {
@@ -28,6 +30,7 @@ DLX_Node::DLX_Node(const DLX_Node& copyMe) {
     listHeader = copyMe.listHeader;
     name = copyMe.name;
     numNodes = copyMe.numNodes;
+    index = copyMe.index;
 }
 
 DLX_Node::~DLX_Node() {}
@@ -54,6 +57,10 @@ void DLX_Node::setHeader(std::shared_ptr<DLX_Node> ptr) {
 
 void DLX_Node::setName(char newName) {
     name = newName;
+}
+
+void DLX_Node::setIndex(int newIndex) {
+    index = newIndex;
 }
 
 void DLX_Node::numNodesAdd() {
@@ -86,6 +93,10 @@ std::shared_ptr<DLX_Node> DLX_Node::getHeader() const {
 
 char DLX_Node::getName() const {
     return name;
+}
+
+int DLX_Node::getIndex() const {
+    return index;
 }
 
 int DLX_Node::getNumNodes() const {
