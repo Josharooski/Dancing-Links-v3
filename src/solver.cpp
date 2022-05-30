@@ -38,7 +38,7 @@ void outputPointers();
 std::vector<char> inputVec;
 std::vector<std::shared_ptr<DLX_Node>> networkVec;
 std::shared_ptr<DLX_Node> headPtr = std::make_shared<DLX_Node>();
-int numFiles = 1;
+int numFiles = 0;
 
 
 
@@ -47,8 +47,11 @@ int main() {
     headPtr->setName('H');
     readFile();
     buildNetwork();
+    std::cout << "File " << numFiles << " Initial state" << '\n';
     outputPointers();
+    ++numFiles;
     search(0);
+    std::cout << "File " << numFiles << " State on exit" << '\n';
     outputPointers();
     return 0;
 }
@@ -57,7 +60,7 @@ int main() {
 
 void readFile() {
     std::ifstream XCfile;
-    XCfile.open("C:/users/jgils/git-repos/dancing-links-v3/test-file.txt");
+    XCfile.open("C:/users/josh/documents/github/dancing-links-v3/src/test-file.txt");
 
     if(!XCfile.is_open()) {
         std::cout << "File opening failed.";
@@ -207,6 +210,12 @@ void cover(std::shared_ptr<DLX_Node> coverMe) {
 
     coverMe->getRight()->setLeft(coverMe->getLeft());
     coverMe->getLeft()->setRight(coverMe->getRight());
+
+    // *TEST*
+    std::cout << "File " << numFiles << " is covering ";
+    std::cout << checker->getName() << '\n';
+    outputPointers();
+    ++numFiles;
 }
 
 
@@ -221,6 +230,12 @@ void uncover(std::shared_ptr<DLX_Node> uncoverMe) {
         unhide(runner);
         runner = runner->getUp();
     }
+
+    // *TEST*
+    std::cout << "File " << numFiles << " is uncovering ";
+    std::cout << runner->getName() << '\n';
+    outputPointers();
+    ++numFiles;
 }
 
 
@@ -278,16 +293,10 @@ void search(int level) {
         //X4
         cover(currentItem);
 
-        // *TEST*
-        outputPointers();
-
         solution[level] = currentItem->getDown();
         //X5
         if(solution[level] != currentItem) {
             coverSubItems(solution[level]);
-            
-            // *TEST*
-            outputPointers();
 
             level += 1;
             search(level);
@@ -295,9 +304,6 @@ void search(int level) {
         //X7
         else{
             uncover(currentItem);
-
-            // *TEST*
-            outputPointers();
         }
     }
     //X8
@@ -307,17 +313,11 @@ void search(int level) {
             //X6
             uncoverSubItems(solution[level]);
 
-            // *TEST*
-            outputPointers();
-
             currentItem = solution[level]->getHeader();
             solution[level] = solution[level]->getDown();
             //X5
             if(solution[level] != currentItem) {
                 coverSubItems(solution[level]);
-
-                // *TEST*
-                outputPointers();
 
                 level += 1;
                 search(level);
@@ -353,6 +353,12 @@ void coverSubItems(std::shared_ptr<DLX_Node> item) {
             checker = networkVec[checker->getIndex() + 1];
         }
     }
+
+    // *TEST*
+    std::cout << "File " << numFiles << " is covering ";
+    std::cout << checker->getHeader()->getName() << '\n';
+    outputPointers();
+    ++numFiles;
 }
 
 
@@ -369,6 +375,12 @@ void uncoverSubItems(std::shared_ptr<DLX_Node> item) {
             checker = networkVec[checker->getIndex() - 1];
         }
     }
+
+    // *TEST*
+    std::cout << "File " << numFiles << " is uncovering ";
+    std::cout << checker->getHeader()->getName() << '\n';
+    outputPointers();
+    ++numFiles;
 }
 
 
@@ -520,10 +532,10 @@ void outputPointers() {
     std::string fileName = "OutputFiles/testOutput";
     fileName += std::to_string(numFiles);
     fileName += ".txt";
-    ++numFiles;
     std::fstream outfile;
     outfile.open(fileName, std::fstream::out | std::fstream::trunc);
     std::shared_ptr<DLX_Node> printMe = headPtr;
+    outfile << fileName << std::endl;
     outfile << "Pointers" << std::endl;
     while(printMe->getIndex() != networkVec.size()) {
         outfile << printMe->getIndex();
