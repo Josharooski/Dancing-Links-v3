@@ -33,6 +33,24 @@ DLX_Node::DLX_Node(const DLX_Node& copyMe) {
     index = copyMe.index;
 }
 
+
+
+DLX_Node DLX_Node::operator=(const DLX_Node& right) {
+    if(this != &right) {
+        leftPtr = right.leftPtr;
+        rightPtr = right.rightPtr;
+        upPtr = right.upPtr;
+        downPtr = right.downPtr;
+        listHeader = right.listHeader;
+        name = right.name;
+        numNodes = right.numNodes;
+        index = right.index;
+    }
+    return *this;
+}
+
+
+
 DLX_Node::~DLX_Node() {}
 
 void DLX_Node::setLeft(std::shared_ptr<DLX_Node> ptr) {

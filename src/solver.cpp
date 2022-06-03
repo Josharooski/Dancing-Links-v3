@@ -19,7 +19,11 @@ void cover(std::shared_ptr<DLX_Node> coverMe);
 void uncover(std::shared_ptr<DLX_Node> uncoverMe);
 void hide(std::shared_ptr<DLX_Node> hideMe);
 void unhide(std::shared_ptr<DLX_Node> unhideMe);
-void search(int level);
+void searchMain();
+void search(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem);
+void searchRecur(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem);
+void searchSub(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem);
+void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution);
 void coverSubItems(std::shared_ptr<DLX_Node> item);
 void uncoverSubItems(std::shared_ptr<DLX_Node> item);
 int lowestNumNodes();
@@ -39,6 +43,7 @@ std::vector<char> inputVec;
 std::vector<std::shared_ptr<DLX_Node>> networkVec;
 std::shared_ptr<DLX_Node> headPtr = std::make_shared<DLX_Node>();
 int numFiles = 0;
+int numHeaders = 0;
 
 
 
@@ -47,12 +52,8 @@ int main() {
     headPtr->setName('H');
     readFile();
     buildNetwork();
-    std::cout << "File " << numFiles << " Initial state" << '\n';
-    outputPointers();
     ++numFiles;
-    search(0);
-    std::cout << "File " << numFiles << " State on exit" << '\n';
-    outputPointers();
+    searchMain();
     return 0;
 }
 
@@ -60,7 +61,7 @@ int main() {
 
 void readFile() {
     std::ifstream XCfile;
-    XCfile.open("C:/users/josh/documents/github/dancing-links-v3/src/test-file.txt");
+    XCfile.open("C:/Users/jgils/git-repos/Dancing-Links-v3/test-file.txt");
 
     if(!XCfile.is_open()) {
         std::cout << "File opening failed.";
@@ -119,6 +120,7 @@ void buildVector() {
 
 void connectHeaderList(int& index) {
     while(networkVec[index]->getName() != ' ') {
+        ++numHeaders;
         networkVec[index]->setRight(networkVec[index + 1]);
 
         if(index != 0) {
@@ -200,6 +202,88 @@ void insertNode(std::shared_ptr<DLX_Node> newNode, int index) {
 
 
 
+void searchMain() {
+    static std::vector<std::shared_ptr<DLX_Node>> solution(numHeaders);
+    std::shared_ptr<DLX_Node> currentItem;
+    int level = 0;
+    bool searchComplete = false;
+
+    currentItem = networkVec[lowestNumNodes()];
+    solution[level] = currentItem->getDown();
+    
+    search(level, searchComplete, solution, currentItem);
+}
+
+
+
+void search(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
+
+    searchRecur(level, complete, solution, currentItem);
+    //X8
+    while(level != 0) {
+        level -= 1;
+        //X6
+        uncoverSubItems(solution[level]);
+        if(!complete) {
+            currentItem = solution[level]->getHeader();
+            solution[level] = solution[level]->getDown();
+            
+            searchSub(level, complete, solution, currentItem);
+        }
+    }
+    printSolution(solution);
+}
+
+
+// push_back needs to be after recursive call?
+void searchRecur(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
+    //X2
+    if(headPtr->getRight() != headPtr) {
+        //X3
+        currentItem = networkVec[lowestNumNodes()];
+        //X4
+        cover(currentItem);
+        solution[level] = currentItem->getDown();
+        //X5&X7
+        searchSub(level, complete, solution, currentItem);
+    }
+    else {
+        complete = true;
+    }
+}
+
+
+
+void searchSub(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
+    if(solution[level] != currentItem) {
+        coverSubItems(solution[level]);
+        level += 1;
+        searchRecur(level, complete, solution, currentItem);
+    }
+    else {
+        uncover(currentItem);
+    }
+}
+
+
+
+void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution) {
+    std::cout << "Solution:" << '\n';
+    std::shared_ptr<DLX_Node> printMe;
+    for(int i = 0; i < numHeaders; ++i) {
+        if(solution[i] != nullptr) {
+            printMe = solution[i];
+            while(printMe->getHeader() != nullptr) {
+                std::cout << printMe->getName() << ' ';
+                printMe = networkVec[printMe->getIndex() + 1];
+            }
+            std::cout << '\n';
+        }
+    }
+}
+
+
+
 void cover(std::shared_ptr<DLX_Node> coverMe) {
     std::shared_ptr<DLX_Node> checker = coverMe->getDown();
 
@@ -212,30 +296,10 @@ void cover(std::shared_ptr<DLX_Node> coverMe) {
     coverMe->getLeft()->setRight(coverMe->getRight());
 
     // *TEST*
-    std::cout << "File " << numFiles << " is covering ";
-    std::cout << checker->getName() << '\n';
-    outputPointers();
-    ++numFiles;
-}
-
-
-
-void uncover(std::shared_ptr<DLX_Node> uncoverMe) {
-    uncoverMe->getLeft()->setRight(uncoverMe);
-    uncoverMe->getRight()->setLeft(uncoverMe);
-
-    std::shared_ptr<DLX_Node> runner = uncoverMe->getUp();
-
-    while(runner != uncoverMe) {
-        unhide(runner);
-        runner = runner->getUp();
-    }
-
-    // *TEST*
-    std::cout << "File " << numFiles << " is uncovering ";
-    std::cout << runner->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is covering ";
+    // std::cout << checker->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
 }
 
 
@@ -247,94 +311,14 @@ void hide(std::shared_ptr<DLX_Node> hideMe) {
     while(checker != hideMe) {
         if(checker->getHeader() == nullptr) {
             checker = checker->getUp();
-            currentIndex = hideMe->getIndex();
+            currentIndex = checker->getIndex();
         }
         else {
             checker->getDown()->setUp(checker->getUp());
             checker->getUp()->setDown(checker->getDown());
             checker->getHeader()->numNodesSub();
             ++currentIndex;
-        }
-        checker = networkVec[currentIndex];
-    }
-}
-
-
-
-void unhide(std::shared_ptr<DLX_Node> unhideMe) {
-    int currentIndex = unhideMe->getIndex() - 1;
-    std::shared_ptr<DLX_Node> runner = networkVec[currentIndex];
-
-    while(runner != unhideMe) {
-        if(runner->getHeader() == nullptr) {
-            runner = runner->getDown();
-            currentIndex = unhideMe->getIndex();
-        }
-        else {
-            runner->getUp()->setDown(runner);
-            runner->getDown()->setUp(runner);
-            runner->getHeader()->numNodesAdd();
-            --currentIndex;
-        }
-        runner = networkVec[currentIndex];
-    }
-}
-
-
-
-void search(int level) {
-    std::shared_ptr<DLX_Node> solution[networkVec.size()];
-    std::shared_ptr<DLX_Node> currentItem;
-
-    //X2
-    if(headPtr->getRight() != headPtr) {
-        //X3
-        currentItem = networkVec[lowestNumNodes()];
-        //X4
-        cover(currentItem);
-
-        solution[level] = currentItem->getDown();
-        //X5
-        if(solution[level] != currentItem) {
-            coverSubItems(solution[level]);
-
-            level += 1;
-            search(level);
-        }
-        //X7
-        else{
-            uncover(currentItem);
-        }
-    }
-    //X8
-    else{
-        if(level != 0) {
-            level -= 1;
-            //X6
-            uncoverSubItems(solution[level]);
-
-            currentItem = solution[level]->getHeader();
-            solution[level] = solution[level]->getDown();
-            //X5
-            if(solution[level] != currentItem) {
-                coverSubItems(solution[level]);
-
-                level += 1;
-                search(level);
-            }
-        }
-        else {
-            std::cout << "Solution:" << '\n';
-            std::shared_ptr<DLX_Node> printMe;
-            for(int i = 0; i < networkVec.size(); ++i) {
-                printMe = solution[i];
-                if(printMe != nullptr) {
-                    while(printMe->getHeader() != nullptr) {
-                        std::cout << printMe->getName() << ' ';
-                        printMe = networkVec[printMe->getIndex() + 1];
-                    }
-                }
-            }
+            checker = networkVec[currentIndex];
         }
     }
 }
@@ -355,32 +339,75 @@ void coverSubItems(std::shared_ptr<DLX_Node> item) {
     }
 
     // *TEST*
-    std::cout << "File " << numFiles << " is covering ";
-    std::cout << checker->getHeader()->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is covering (sub) ";
+    // std::cout << checker->getHeader()->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
+}
+
+
+
+void uncover(std::shared_ptr<DLX_Node> uncoverMe) {
+    uncoverMe->getLeft()->setRight(uncoverMe);
+    uncoverMe->getRight()->setLeft(uncoverMe);
+
+    std::shared_ptr<DLX_Node> runner = uncoverMe->getUp();
+
+    while(runner != uncoverMe) {
+        unhide(runner);
+        runner = runner->getUp();
+    }
+
+    // *TEST*
+    // std::cout << "File " << numFiles << " is uncovering ";
+    // std::cout << runner->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
+}
+
+
+
+void unhide(std::shared_ptr<DLX_Node> unhideMe) {
+    int currentIndex = unhideMe->getIndex() - 1;
+    std::shared_ptr<DLX_Node> runner = networkVec[currentIndex];
+
+    while(runner != unhideMe) {
+        if(runner->getHeader() == nullptr) {
+            runner = runner->getDown();
+            currentIndex = runner->getIndex();
+        }
+        else {
+            runner->getUp()->setDown(runner);
+            runner->getDown()->setUp(runner);
+            runner->getHeader()->numNodesAdd();
+            --currentIndex;
+            runner = networkVec[currentIndex];
+        }
+    }
 }
 
 
 
 void uncoverSubItems(std::shared_ptr<DLX_Node> item) {
-    std::shared_ptr<DLX_Node> checker = networkVec[item->getIndex() - 1];
+    if(item != nullptr) {
+        std::shared_ptr<DLX_Node> checker = networkVec[item->getIndex() - 1];
 
-    while(checker != item) {
-        if(checker->getHeader() == nullptr) {
-            checker = checker->getDown();
-        }
-        else {
-            uncover(checker->getHeader());
-            checker = networkVec[checker->getIndex() - 1];
+        while(checker != item) {
+            if(checker->getHeader() == nullptr) {
+                checker = checker->getDown();
+            }
+            else {
+                uncover(checker->getHeader());
+                checker = networkVec[checker->getIndex() - 1];
+            }
         }
     }
 
     // *TEST*
-    std::cout << "File " << numFiles << " is uncovering ";
-    std::cout << checker->getHeader()->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is uncovering (sub) ";
+    // std::cout << checker->getHeader()->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
 }
 
 

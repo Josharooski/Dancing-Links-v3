@@ -18,6 +18,7 @@ class DLX_Node {
         DLX_Node();
         DLX_Node(char newName);
         DLX_Node(const DLX_Node& copyMe);
+        DLX_Node operator=(const DLX_Node& right);
         ~DLX_Node();
 
         void setLeft(std::shared_ptr<DLX_Node> ptr);
