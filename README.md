@@ -12,7 +12,8 @@ Ex:                     Items:    a b c d e f g          a b c d e f g
 
 Given the 6 x 7 0-1 matrix example, there are 7 items that need to covered by six options. In the character example it becomes clearer, items are named a-g and each option is some collection of those items. The solution for this example is Options 2, 4 and 6.
 
-As of June 6:
-- The process is automatic upon running the program. It will read the hardcoded file, create the network, search for a solution and print it out. Future versions will take a user input matrix of the form "abcdefg adg ad deg cef bcfg bg" (using this example's data) or a user specified file.
+As of now, the program will only produce the first solution it finds, regardless of how many there are. If I develop this much further I will expand functionality for all solutions to be found and printed.
 
-- Testing on the searching process is in the early stages. Just exited the "make it work" phase, entering the "make it efficient" phase. More testing functions to come.
+If you decide to try the source code out yourself there are two input methods. You can hardcode the path to the text file into readFile() or you can input the path at runtime into the console with inputHandler().
+
+There are few security measures in place (empty matrices are untested as are various other cases) so be careful.

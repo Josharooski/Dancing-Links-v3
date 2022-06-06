@@ -27,6 +27,8 @@ void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution);
 void coverSubItems(std::shared_ptr<DLX_Node> item);
 void uncoverSubItems(std::shared_ptr<DLX_Node> item);
 int lowestNumNodes();
+bool inputHandler();
+void displayHelp();
 
 // Testing
 void TEST_PrintNetworkVector();
@@ -43,6 +45,7 @@ void outputGraph();
 // Globals
 std::vector<char> inputVec;
 std::vector<std::shared_ptr<DLX_Node>> networkVec;
+std::vector<std::shared_ptr<DLX_Node>> optionsVec;
 std::shared_ptr<DLX_Node> headPtr = std::make_shared<DLX_Node>();
 int numFiles = 0;
 int numHeaders = 0;
@@ -53,14 +56,16 @@ int main() {
     headPtr->setRight(headPtr);
     headPtr->setName('H');
     readFile();
+    // if(!inputHandler()) {
+    //     exit(0);
+    // }
     buildNetwork();
     std::cout << "File 0 - initial network";
-    ++numFiles;
     outputPointers();
+    ++numFiles;
     searchMain();
     ++numFiles;
     std::cout << "File " << numFiles << " - on exit";
-    return 0;
 }
 
 
@@ -73,7 +78,7 @@ int main() {
  */
 void readFile() {
     std::ifstream XCfile;
-    XCfile.open("C:/Users/jgils/git-repos/Dancing-Links-v3/TestCases/test-file.txt");
+    XCfile.open("C:/Users/jgils/git-repos/Dancing-Links-v3/TestCases/test-file2.txt");
 
     if(!XCfile.is_open()) {
         std::cout << "File opening failed.";
@@ -189,6 +194,7 @@ void insertSpacerNode(std::shared_ptr<DLX_Node> newSpacer, int index) {
             --tempSearch;
         }
         networkVec[index]->setUp(networkVec[tempSearch + 1]);
+        optionsVec.push_back(networkVec[index]->getUp());
     }
 }
 
@@ -291,7 +297,16 @@ void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution) {
     std::shared_ptr<DLX_Node> printMe;
     for(int i = 0; i < numHeaders; ++i) {
         if(solution[i] != nullptr) {
-            printMe = solution[i];
+            if(networkVec[solution[i]->getIndex() - 1]->getName() != ' ') {
+                printMe = solution[i];
+                while(printMe->getName() != ' ') {
+                    printMe = networkVec[printMe->getIndex() + 1];
+                }
+                printMe = printMe->getUp();
+            }
+            else {
+                printMe = solution[i];
+            }
             int optionNum = 0;
             int itemNum = 0;
             while(itemNum != printMe->getIndex()) {
@@ -450,6 +465,7 @@ int lowestNumNodes() {
     }
     int indexOfLowest = checker->getIndex();
     int lowestNumNdoes = checker->getNumNodes();
+    checker = checker->getRight();
 
     while(checker != headPtr) {
         if(lowestNumNdoes > checker->getNumNodes()) {
@@ -459,6 +475,70 @@ int lowestNumNodes() {
     }
 
     return indexOfLowest;
+}
+
+
+
+bool inputHandler() {
+    std::string userInput;
+    std::ifstream XCfile;
+    bool proceed = true, open = false;
+    do {    
+        std::cout << "Enter the path to the exact cover problem text file" << '\n';
+        std::cout << "(-1 to quit, 'help' for help)" << '\n';
+        std::cout << "\t-> ";
+        
+        std::getline(std::cin, userInput);
+        if(userInput == "-1") {
+            proceed = false;
+            continue;
+        }
+        else if(userInput == "help") {
+            displayHelp();
+            continue;
+        }
+
+        XCfile.open(userInput);
+        if(!XCfile.is_open()) {
+            std::cout << "File opening failed.\n";
+            continue;
+        }
+
+        open = true;
+        while(!XCfile.eof()) {
+            if(XCfile.peek() == '#' || XCfile.peek() == '\n') {
+                XCfile.ignore(256, '\n');
+            }
+            else {
+                std::string currentLine;
+                while(std::getline(XCfile, currentLine, '\n')) {
+                    if(currentLine.size() > 0) {
+                        for(int size = 0; size < currentLine.length(); size++) {
+                            inputVec.push_back(currentLine[size]);
+                        }
+                        inputVec.push_back(' ');
+                    }
+                }
+            }
+        }
+    } while(userInput != "-1" && !open);
+    XCfile.close();
+    return proceed;
+}
+
+
+
+void displayHelp() {
+    std::cout << "\nTo open your file name, make sure it's located in the project directory\n";
+    std::cout << "and use the format yourFile.txt.\n\n";
+    std::cout << "Your file must follow the following format:\n";
+    std::cout << "For an (MxN) matrix where M = num of columns, N = num of rows\n";
+    std::cout << "Name each M uniquely and type them without spaces. If M = 7, 'abcdefg'\n";
+    std::cout << "Each following N lines should be a set of those letters. 'cdg', 'adg', 'be'\n\n";
+    std::cout << "EX: \n" << "\tabcdefg\n" << "\tce\n" << "\tadg\n" << "\tbcf\n" << "\tadf\n";
+    std::cout << "\tbg\n" << "\tdeg\n\n";
+    std::cout << "NOTE: All lines that start with a '#' or is empty will be ignored and skipped.\n";
+    std::cout << "Don't use any spaces or characters outside of the item names.\n\n";
 }
 
 
@@ -577,10 +657,11 @@ void TEST_PointersPrintout() {
             std::cout << " - ";
             std::cout << "L: " << printMe->getLeft()->getName() << ' ' << printMe->getLeft()->getIndex() << " - ";
             std::cout << "R: " << printMe->getRight()->getName() << ' ' << printMe->getRight()->getIndex();
+            std::cout << "# nodes: " << printMe->getNumNodes();
         }
         std::cout << std::endl;
 
-        if(printMe->getIndex() == networkVec.size() - 1) {
+        if(printMe->getIndex() != networkVec.size() - 1) {
             break;
         }
         printMe = networkVec[printMe->getIndex() + 1];
@@ -654,7 +735,8 @@ void outputPointers() {
         if(printMe->getRight() != nullptr) {
             outfile << " - ";
             outfile << "L: " << printMe->getLeft()->getName() << ' ' << printMe->getLeft()->getIndex() << " - ";
-            outfile << "R: " << printMe->getRight()->getName() << ' ' << printMe->getRight()->getIndex();
+            outfile << "R: " << printMe->getRight()->getName() << ' ' << printMe->getRight()->getIndex() << " - ";
+            outfile << "# nodes: " << printMe->getNumNodes();
         }
         outfile << std::endl;
 
