@@ -1,0 +1,8 @@
+# Test case 5 (5x6) - PASS
+
+abcdef
+ac
+bcd
+aef
+be
+f

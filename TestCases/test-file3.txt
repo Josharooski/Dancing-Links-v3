@@ -1,0 +1,8 @@
+# Test case 3 (5x6) - PASS
+
+abcdef
+abce
+ab
+df
+cdf
+ce

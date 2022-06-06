@@ -1,0 +1,9 @@
+# Test case 2 (6x7) - FAIL
+
+abcdefg
+adg
+ad
+deg
+cef
+bcfg
+bg

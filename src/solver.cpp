@@ -343,10 +343,10 @@ void cover(std::shared_ptr<DLX_Node> coverMe) {
     coverMe->getLeft()->setRight(coverMe->getRight());
 
     // *TEST*
-    std::cout << "File " << numFiles << " is covering ";
-    std::cout << checker->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is covering ";
+    // std::cout << checker->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
 }
 
 
@@ -386,10 +386,10 @@ void coverSubItems(std::shared_ptr<DLX_Node> item) {
     }
 
     // *TEST*
-    std::cout << "File " << numFiles << " is covering (sub) ";
-    std::cout << checker->getHeader()->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is covering (sub) ";
+    // std::cout << checker->getHeader()->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
 }
 
 
@@ -406,10 +406,10 @@ void uncover(std::shared_ptr<DLX_Node> uncoverMe) {
     }
 
     // *TEST*
-    std::cout << "File " << numFiles << " is uncovering ";
-    std::cout << runner->getName() << '\n';
-    outputPointers();
-    ++numFiles;
+    // std::cout << "File " << numFiles << " is uncovering ";
+    // std::cout << runner->getName() << '\n';
+    // outputPointers();
+    // ++numFiles;
 }
 
 
@@ -449,10 +449,10 @@ void uncoverSubItems(std::shared_ptr<DLX_Node> item) {
             }
         }
         // *TEST*
-        std::cout << "File " << numFiles << " is uncovering (sub) ";
-        std::cout << checker->getHeader()->getName() << '\n';
-        outputPointers();
-        ++numFiles;
+        // std::cout << "File " << numFiles << " is uncovering (sub) ";
+        // std::cout << checker->getHeader()->getName() << '\n';
+        // outputPointers();
+        // ++numFiles;
     }
 }
 

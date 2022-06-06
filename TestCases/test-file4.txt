@@ -1,0 +1,8 @@
+# Test case 4 (5x5) - FAIL
+
+abcde
+ae
+bd
+bc
+c
+ade
