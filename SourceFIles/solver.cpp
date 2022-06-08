@@ -108,8 +108,10 @@ void readFile() {
 
 
 /**
- * @brief 
+ * @brief Handles node vector creation and pointer network
  * 
+ * @pre inputVec has been filled with accurately foramtted matrix
+ * @post networkVec is filled, pointers are connected
  */
 void buildNetwork() {
     int travelIndex = 0;
@@ -123,6 +125,11 @@ void buildNetwork() {
 
 
 
+/**
+ * @brief Takes user input and creates node network
+ * 
+ * @post networkVec will be filled with active nodes
+ */
 void buildVector() {
     networkVec.push_back(headPtr);
     std::vector<char>::iterator iter = inputVec.begin();
@@ -139,6 +146,12 @@ void buildVector() {
 
 
 
+/**
+ * @brief Connects header list left and right pointers
+ * @param index - position in networkVec to work on
+ * 
+ * @post All essential left-right pointers connected
+ */
 void connectHeaderList(int& index) {
     while(networkVec[index]->getName() != ' ') {
         ++numHeaders;
@@ -159,6 +172,12 @@ void connectHeaderList(int& index) {
 
 
 
+/**
+ * @brief Connects all options' pointers
+ * @param index - position in networkVec to work on
+ * 
+ * @post networkVec will be complete
+ */
 void connectNodeList(int index) {
     while(index != networkVec.size()) {
         if(networkVec[index]->getName() == ' ') {
@@ -173,6 +192,13 @@ void connectNodeList(int index) {
 
 
 
+/**
+ * @brief Connects spacer node up/down pointers
+ * @param newSpacer - spacer node from networkVec
+ * @param index - for finding neighboring nodes
+ * 
+ * @post newSpacers up/down pointers are connected
+ */
 void insertSpacerNode(std::shared_ptr<DLX_Node> newSpacer, int index) {
     int tempSearch = index + 1;
     if(tempSearch < networkVec.size()) {
@@ -200,6 +226,13 @@ void insertSpacerNode(std::shared_ptr<DLX_Node> newSpacer, int index) {
 
 
 
+/**
+ * @brief Connects node up/down pointers
+ * @param newNode - node from networkVec
+ * @param index - for finding neighboring nodes
+ * 
+ * @post newNodes up/down pointers connected
+ */
 void insertNode(std::shared_ptr<DLX_Node> newNode, int index) {
     std::shared_ptr<DLX_Node> runner = headPtr->getRight();
 
@@ -224,6 +257,9 @@ void insertNode(std::shared_ptr<DLX_Node> newNode, int index) {
 
 
 
+/**
+ * @brief Call to initiate search on networkVec
+ */
 void searchMain() {
     std::vector<std::shared_ptr<DLX_Node>> solution(numHeaders);
     std::shared_ptr<DLX_Node> currentItem;
@@ -238,6 +274,16 @@ void searchMain() {
 
 
 
+/**
+ * @brief Main house of search functionality. 
+ * 
+ * @param level - # of current recursive calls. Element for backtracking
+ * @param complete - when true signals the begin of uncovering
+ * @param solution - vector of saved options in solution
+ * @param currentItem - current item to be covered, item with least numNodes
+ * 
+ * @post solution is filled and printed
+ */
 void search(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
 
     searchRecur(level, complete, solution, currentItem);
@@ -258,15 +304,20 @@ void search(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& 
 
 
 
+/**
+ * @brief Recursive section of algorithm
+ * 
+ * @param level - # of current recursive calls. Element for backtracking
+ * @param complete - false until header list is empty
+ * @param solution - vector of saved options in solution
+ * @param currentItem - current item to be covered, item with least numNodes
+ */
 void searchRecur(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
-    //X2
     if(headPtr->getRight() != headPtr) {
-        //X3
         currentItem = networkVec[lowestNumNodes()];
-        //X4
         cover(currentItem);
         solution[level] = currentItem->getDown();
-        //X5&X7
+        
         searchSub(level, complete, solution, currentItem);
     }
     else {
@@ -276,6 +327,14 @@ void searchRecur(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Nod
 
 
 
+/**
+ * @brief Covers items related to currentItem
+ * 
+ * @param level - # of current recursive calls. Element for backtracking
+ * @param complete - passed in for recursive purposes
+ * @param solution - vector of saved options in solution
+ * @param currentItem - current item to be covered, item with least numNodes
+ */
 void searchSub(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>>& solution, std::shared_ptr<DLX_Node>& currentItem) {
     if(solution[level] != currentItem) {
         coverSubItems(solution[level]);
@@ -289,6 +348,11 @@ void searchSub(int& level, bool& complete, std::vector<std::shared_ptr<DLX_Node>
 
 
 
+/**
+ * @brief Prints each option associated with solution
+ * 
+ * @param solution - vector of saved options in solution
+ */
 void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution) {
     TEST_PrintInputAsGraph();
     std::cout << '\n';
@@ -331,6 +395,13 @@ void printSolution(std::vector<std::shared_ptr<DLX_Node>>& solution) {
 
 
 
+/**
+ * @brief Cover a single item
+ * 
+ * @param coverMe - item to be covered
+ * 
+ * @post coverMe's left/right neighbors are pointing at each other
+ */
 void cover(std::shared_ptr<DLX_Node> coverMe) {
     std::shared_ptr<DLX_Node> checker = coverMe->getDown();
 
@@ -351,6 +422,11 @@ void cover(std::shared_ptr<DLX_Node> coverMe) {
 
 
 
+/**
+ * @brief Covers nodes in options related to current item
+ * 
+ * @param hideMe - 
+ */
 void hide(std::shared_ptr<DLX_Node> hideMe) {
     int currentIndex = hideMe->getIndex() + 1;
     std::shared_ptr<DLX_Node> checker = networkVec[currentIndex];
